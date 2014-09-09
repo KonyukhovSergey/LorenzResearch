@@ -79,37 +79,42 @@ namespace attractor
 			}
 		}
 		
+		private void Tick(float dt)
+		{
+			
+		}
+		
 		private void CalculateForces()
 		{
-			points[points.Length - 1].fx = 0;
-			points[points.Length - 1].fy = 0;
+			// zero forces
+			for (int i = 0; i < points.Length; i++)
+			{
+				points[i].fx = 0;
+				points[i].fy = 0;
+			}
 		
 			for (int i = 0; i < points.Length - 1; i++)
 			{
 				GravityPoint gp1 = points[i];
-				gp1.fx = 0;
-				gp1.fy = 0;
-				
+								
 				for (int j = i + 1; j < points.Length; j++)
 				{
 					// f = G * m1 * m2 / r ^ 2
 					
 					GravityPoint gp2 = points[j];
 
-					float rr = (gp1.x - gp2.x) * (gp1.x - gp2.x) + (gp1.y - gp2.y) * (gp1.y - gp2.y);
-					// f= 1/rr
-					// fx = nx * f;
-					// nx = dx/r;
+					float r = (float)Math.Sqrt((gp1.x - gp2.x) * (gp1.x - gp2.x) + (gp1.y - gp2.y) * (gp1.y - gp2.y));
 					
-				//rx = x2-x1/r
+					float fx = (gp2.x - gp1.x) / r;
+					float fy = (gp2.y - gp1.y) / r;
 					
-					float fx = rx / rr;
-					float fy=1/
+					gp1.fx += fx;
+					gp1.fy += fy;
 					
-					
+					gp2.fx -= fx;
+					gp2.fy -= fy;
 				}
 			}
-		
 		}
 		
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
