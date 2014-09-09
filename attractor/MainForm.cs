@@ -20,12 +20,15 @@ namespace attractor
 	{
 		private Bitmap bmp;
 		private Graphics gr;
+		private ViewPort vp = new ViewPort();
 		
 		private int[] scr;
 		private int width, height;
 		
 		private Random rnd = new Random(Environment.TickCount);
 		private volatile bool isWork = true;
+		
+		private GravityPoint[] points = new GravityPoint[2];
 		
 		public MainForm()
 		{
@@ -63,6 +66,50 @@ namespace attractor
 					Thread.Sleep(16);
 				}
 			});
+			
+			Init();
+		}
+		
+		private void Init()
+		{
+			for (int i = 0; i < points.Length; i++)
+			{
+				points[i] = new GravityPoint();
+				points[i].Init((float)rnd.NextDouble() * 3 - 1, (float)rnd.NextDouble() * 3 - 1, 1, (float)rnd.NextDouble() * .02f - 0.01f, (float)rnd.NextDouble() * .02f - 0.01f);
+			}
+		}
+		
+		private void CalculateForces()
+		{
+			points[points.Length - 1].fx = 0;
+			points[points.Length - 1].fy = 0;
+		
+			for (int i = 0; i < points.Length - 1; i++)
+			{
+				GravityPoint gp1 = points[i];
+				gp1.fx = 0;
+				gp1.fy = 0;
+				
+				for (int j = i + 1; j < points.Length; j++)
+				{
+					// f = G * m1 * m2 / r ^ 2
+					
+					GravityPoint gp2 = points[j];
+
+					float rr = (gp1.x - gp2.x) * (gp1.x - gp2.x) + (gp1.y - gp2.y) * (gp1.y - gp2.y);
+					// f= 1/rr
+					// fx = nx * f;
+					// nx = dx/r;
+					
+				//rx = x2-x1/r
+					
+					float fx = rx / rr;
+					float fy=1/
+					
+					
+				}
+			}
+		
 		}
 		
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -84,6 +131,7 @@ namespace attractor
 		{ 
 			Invoke(action);
 		}
+		
 		private void OnDraw()
 		{
 			for (int i = 0; i < scr.Length; i++)
@@ -92,10 +140,10 @@ namespace attractor
 				scr[i] = scr[i] > 0 ? scr[i] - 1 : 0;
 			}
 			
-			for (int i = 0; i < 100; i++)
-			{
-				scr[rnd.Next() % (width * height)] = 0xff;
-			}
+			vp.PixelSet(-1, -1, 0xffffff);
+			vp.PixelSet(1, -1, 0xffffff);
+			vp.PixelSet(1, 1, 0xffffff);
+			vp.PixelSet(-1, 1, 0xffffff);
 			
 		}
 		
@@ -116,8 +164,8 @@ namespace attractor
 				bmp = new Bitmap(width, height, PixelFormat.Format32bppRgb);
 				gr = Graphics.FromImage(bmp);
 				scr = new int[width * height];
+				vp.Setup(width, height, 10, scr, width);
 			}
-			
 			
 			BitmapData bd = bmp.LockBits(ClientRectangle, ImageLockMode.ReadWrite, PixelFormat.Format32bppRgb);
 			Marshal.Copy(scr, 0, bd.Scan0, scr.Length);
@@ -128,10 +176,8 @@ namespace attractor
 		
 		protected override void OnSizeChanged(EventArgs e)
 		{
-			if (scr != null)
-			{
-				scr = null;
-			}
+			scr = null;
+			
 			if (bmp != null)
 			{
 				gr.Dispose();

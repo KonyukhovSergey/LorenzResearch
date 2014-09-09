@@ -15,30 +15,34 @@ namespace attractor
 	{
 		public float ox, oy;
 		public float sx, sy;
-		private int width, height;
+		private int width, height, stride;
+		private int[] scr;
+		
 
-		public ViewPort(int width, int height, float size)
+		public ViewPort()
 		{
-			ox = -size * 0.5f;
-			oy = -0.5f * size * (float)height / (float)width;
+		}
+		
+		public void Setup(int width, int height, float size, int[] scr, int stride)
+		{
+			ox = size * 0.5f;
+			oy = 0.5f * size * (float)height / (float)width;
 			sx = (float)width / (size);
 			sy = sx;
 			this.width = width;
 			this.height = height;
+			this.scr = scr;
+			this.stride = stride;
 		}
 		
-		public int PixelIndex(float x, float y, int stride)
+		public void PixelSet(float x, float y, int color)
 		{
 			int px = (int)((x + ox) * sx);
 			int py = (int)((y + oy) * sy);
 			
 			if (px >= 0 && px < width && py >= 0 && py < height)
 			{
-				return px + py * stride;
-			}
-			else
-			{
-				return 0;
+				scr[px + py * stride] = color;
 			}
 		}
 	}
