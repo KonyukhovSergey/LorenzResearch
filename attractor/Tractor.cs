@@ -22,16 +22,18 @@ namespace attractor
     
 		public double _a = 5, _b = 15, _c = 1;
 		
+		private MouseControl mc;
 		
-		public Tractor()
+		public Tractor(MouseControl mc)
 		{
+			this.mc = mc;
 		}
 		
 		public void TickAndDraw(ViewPort vp)
 		{
 			t += dt;
-			double a = _a + 3*Math.Sin(t);
-			double b = _b + 10*Math.Cos(t);
+			double a = _a + mc.dx;
+			double b = _b + mc.dy;
 			double c = _c;
 			for (int i = 0; i < 5000; i++)
 			{

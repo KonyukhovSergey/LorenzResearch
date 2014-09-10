@@ -28,12 +28,13 @@ namespace attractor
 		private volatile bool isWork = true;
 		
 		private IDrawer drawer;
+		private MouseControl mc = new MouseControl();
 		
 		public MainForm()
 		{
 			InitializeComponent();
 			
-			drawer = new Tractor();
+			drawer = new Tractor(mc);
 			
 			Task task = Task.Factory.StartNew(() =>
 			{
@@ -67,6 +68,22 @@ namespace attractor
 					Thread.Sleep(16);
 				}
 			});
+		}
+		
+		protected override void OnMouseDown(MouseEventArgs e)
+		{
+			mc.OnDown(e.X, e.Y);
+			base.OnMouseDown(e);
+		}
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			mc.OnMove(e.X, e.Y);
+			base.OnMouseMove(e);
+		}
+		protected override void OnMouseUp(MouseEventArgs e)
+		{
+			mc.OnUp(e.X, e.Y);
+			base.OnMouseUp(e);
 		}
 		
 		
