@@ -13,29 +13,36 @@ namespace attractor
 	/// </summary>
 	public class ViewPort
 	{
-		public float ox, oy;
-		public float sx, sy;
+		public double ox, oy;
+		public double sx, sy;
 		private int width, height, stride;
 		private int[] scr;
+		
+		public double xmin, ymin, xmax, ymax;
 		
 
 		public ViewPort()
 		{
 		}
 		
-		public void Setup(int width, int height, float size, int[] scr, int stride)
+		public void Setup(int width, int height, double size, int[] scr, int stride)
 		{
 			ox = size * 0.5f;
-			oy = 0.5f * size * (float)height / (float)width;
-			sx = (float)width / (size);
+			oy = 0.5f * size * (double)height / (double)width;
+			sx = (double)width / (size);
 			sy = sx;
 			this.width = width;
 			this.height = height;
 			this.scr = scr;
 			this.stride = stride;
+			
+			xmin = -ox;
+			xmax = ox;
+			ymin = -oy;
+			ymax = oy;
 		}
 		
-		public void PixelSet(float x, float y, int color)
+		public void PixelSet(double x, double y, int color)
 		{
 			int px = (int)((x + ox) * sx);
 			int py = (int)((y + oy) * sy);

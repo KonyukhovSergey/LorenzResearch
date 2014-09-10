@@ -25,14 +25,15 @@ namespace attractor
 		private int[] scr;
 		private int width, height;
 		
-		private Random rnd = new Random(Environment.TickCount);
 		private volatile bool isWork = true;
 		
-		private GravityPoint[] points = new GravityPoint[2];
+		private IDrawer drawer;
 		
 		public MainForm()
 		{
 			InitializeComponent();
+			
+			drawer = new Tractor();
 			
 			Task task = Task.Factory.StartNew(() =>
 			{
@@ -41,7 +42,7 @@ namespace attractor
 				while (isWork)
 				{
 					OnDraw();
-					//Thread.Sleep(1000);
+					Thread.Sleep(10);
 					frames++;
 			
 					if (Environment.TickCount - ticks > 1000)
@@ -66,56 +67,8 @@ namespace attractor
 					Thread.Sleep(16);
 				}
 			});
-			
-			Init();
 		}
 		
-		private void Init()
-		{
-			for (int i = 0; i < points.Length; i++)
-			{
-				points[i] = new GravityPoint();
-				points[i].Init((float)rnd.NextDouble() * 3 - 1, (float)rnd.NextDouble() * 3 - 1, 1, (float)rnd.NextDouble() * .02f - 0.01f, (float)rnd.NextDouble() * .02f - 0.01f);
-			}
-		}
-		
-		private void Tick(float dt)
-		{
-			
-		}
-		
-		private void CalculateForces()
-		{
-			// zero forces
-			for (int i = 0; i < points.Length; i++)
-			{
-				points[i].fx = 0;
-				points[i].fy = 0;
-			}
-		
-			for (int i = 0; i < points.Length - 1; i++)
-			{
-				GravityPoint gp1 = points[i];
-								
-				for (int j = i + 1; j < points.Length; j++)
-				{
-					// f = G * m1 * m2 / r ^ 2
-					
-					GravityPoint gp2 = points[j];
-
-					float r = (float)Math.Sqrt((gp1.x - gp2.x) * (gp1.x - gp2.x) + (gp1.y - gp2.y) * (gp1.y - gp2.y));
-					
-					float fx = (gp2.x - gp1.x) / r;
-					float fy = (gp2.y - gp1.y) / r;
-					
-					gp1.fx += fx;
-					gp1.fy += fy;
-					
-					gp2.fx -= fx;
-					gp2.fy -= fy;
-				}
-			}
-		}
 		
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
@@ -137,6 +90,8 @@ namespace attractor
 			Invoke(action);
 		}
 		
+		
+		
 		private void OnDraw()
 		{
 			for (int i = 0; i < scr.Length; i++)
@@ -145,10 +100,12 @@ namespace attractor
 				scr[i] = scr[i] > 0 ? scr[i] - 1 : 0;
 			}
 			
-			vp.PixelSet(-1, -1, 0xffffff);
-			vp.PixelSet(1, -1, 0xffffff);
-			vp.PixelSet(1, 1, 0xffffff);
-			vp.PixelSet(-1, 1, 0xffffff);
+			drawer.TickAndDraw(vp);
+			
+//			vp.PixelSet(-1, -1, 0xffffff);
+//			vp.PixelSet(1, -1, 0xffffff);
+//			vp.PixelSet(1, 1, 0xffffff);
+//			vp.PixelSet(-1, 1, 0xffffff);
 			
 		}
 		
@@ -169,7 +126,7 @@ namespace attractor
 				bmp = new Bitmap(width, height, PixelFormat.Format32bppRgb);
 				gr = Graphics.FromImage(bmp);
 				scr = new int[width * height];
-				vp.Setup(width, height, 10, scr, width);
+				vp.Setup(width, height, 20, scr, width);
 			}
 			
 			BitmapData bd = bmp.LockBits(ClientRectangle, ImageLockMode.ReadWrite, PixelFormat.Format32bppRgb);
